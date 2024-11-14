@@ -1,6 +1,13 @@
 // app.js
-import logger from './utils/logger.js';
-import { startScheduler } from './cron_jobs/scheduler.js';
+import DataCollector from './modules/data_collector.js';
+import ArbitrageDetector from './modules/arbitrage_detector.js';
+import TelegramBotModule from './modules/telegram_bot.js';
 
-logger.info('Aplicação iniciada.');
-startScheduler();
+const dataCollector = new DataCollector();
+const arbitrageDetector = new ArbitrageDetector(dataCollector);
+const telegramBot = new TelegramBotModule();
+
+arbitrageDetector.on('arbitrage_opportunity', (opportunity) => {
+  console.log('Oportunidade de Arbitragem Encontrada:', opportunity);
+  telegramBot.sendArbitrageAlert(opportunity);
+});

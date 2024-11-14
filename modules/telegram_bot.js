@@ -1,17 +1,26 @@
 // modules/telegram_bot.js
 import TelegramBot from 'node-telegram-bot-api';
 import config from '../config.js';
-import logger from '../utils/logger.js';
 
-const bot = new TelegramBot(config.telegramBotToken, { polling: false });
+class TelegramBotModule {
+  constructor() {
+    this.bot = new TelegramBot(config.telegramBotToken, { polling: false });
+  }
 
-export function sendMessage(message) {
-  bot
-    .sendMessage(config.telegramChatId, message, { parse_mode: 'Markdown' })
-    .then(() => {
-      logger.info('Mensagem enviada com sucesso ao Telegram.');
-    })
-    .catch((error) => {
-      logger.error('Erro ao enviar mensagem ao Telegram: %s', error.message);
-    });
+  sendArbitrageAlert(opportunity) {
+    const message = `
+*Oportunidade de Arbitragem Encontrada!*
+
+Símbolo: *${opportunity.symbol}*
+
+Comprar em *${opportunity.buyAt}* por *$${opportunity.buyPrice.toFixed(2)}*
+Vender em *${opportunity.sellAt}* por *$${opportunity.sellPrice.toFixed(2)}*
+
+*Spread*: ${opportunity.spread.toFixed(2)}%
+`;
+
+    this.bot.sendMessage(config.telegramChatId, message, { parse_mode: 'Markdown' });
+  }
 }
+
+export default TelegramBotModule;
